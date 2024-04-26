@@ -61,21 +61,27 @@ class handDetector():
 
     def fingersUp(self):
         fingers = []
-        # Thumb
-        if self.lmList[self.tipIds[0]][1] > self.lmList[self.tipIds[0] - 1][1]:
-            fingers.append(1)
+
+        # Verificar si se detectaron manos
+        if self.lmList:
+            # Thumb
+            if len(self.lmList) > self.tipIds[0] and len(self.lmList) > self.tipIds[0] - 1:
+                if self.lmList[self.tipIds[0]][1] > self.lmList[self.tipIds[0] - 1][1]:
+                    fingers.append(1)
+                else:
+                    fingers.append(0)
+
+            # Fingers
+            for id in range(1, 5):
+                if len(self.lmList) > self.tipIds[id] and len(self.lmList) > self.tipIds[id] - 2:
+                    if self.lmList[self.tipIds[id]][2] < self.lmList[self.tipIds[id] - 2][2]:
+                        fingers.append(1)
+                    else:
+                        fingers.append(0)
+                else:
+                    fingers.append(0)
         else:
-            fingers.append(0)
-
-        # Fingers
-        for id in range(1, 5):
-
-            if self.lmList[self.tipIds[id]][2] < self.lmList[self.tipIds[id] - 2][2]:
-                fingers.append(1)
-            else:
-                fingers.append(0)
-
-        # totalFingers = fingers.count(1)
+            fingers = [0] * 5  # Si no se detecta ninguna mano, todos los dedos están abajo
 
         return fingers
 
@@ -97,7 +103,7 @@ class handDetector():
 def main():
     pTime = 0
     cTime = 0
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     detector = handDetector()
     while True:
         success, img = cap.read()
